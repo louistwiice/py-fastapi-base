@@ -40,6 +40,11 @@ class User(UserBase):
     created_at: datetime
     updated_at: datetime = None
 
+    class Config:
+        orm_mode = True
+
+
+class UserAll(User):
     items: list[Item] = []
 
     class Config:
