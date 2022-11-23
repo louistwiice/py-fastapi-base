@@ -25,6 +25,12 @@ class UserUpdate(BaseModel):
     is_staff: bool = None
 
 
+class ChangePassword(BaseModel):
+    old_password: str
+    new_password: constr(min_length=3)
+    confirm_password: constr(min_length=3)
+
+
 class User(UserBase):
     id: UUID
     picture: str = None

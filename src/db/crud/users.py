@@ -11,7 +11,7 @@ from core.config import ROOT_DIRECTORY
 from db.models import users as models
 from db.schemas import users as users_schemas
 from utils.common import generate_string
-from utils.users.services import hashed_password
+from utils.users.services import hashed_password, verify_password
 
 
 def create(db: Session, user: users_schemas.UserCreate) -> models.User:
@@ -57,6 +57,20 @@ def update(db: Session, user_id: str, user_data: users_schemas.UserUpdate) -> mo
     db_user.last_name = user_data.last_name if user_data.last_name is not None else db_user.last_name
     db_user.email = user_data.email if user_data.email is not None else db_user.email
     db_user.is_staff = user_data.is_staff if user_data.is_staff is not None else db_user.is_staff
+    db_user.updated_at = datetime.now(tz=pytz.UTC)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
+def update_password(db: Session, user_id: str, data: users_schemas.ChangePassword):
+    db_user = get_by_id(db, user_id)
+
+    if not verify_password(data.old_password, db_user.password):
+        return {'error': 'This is not your actual password'}
+
+    hashed_pass = hashed_password(data.new_password)
+    db_user.password = hashed_pass
     db_user.updated_at = datetime.now(tz=pytz.UTC)
     db.commit()
     db.refresh(db_user)

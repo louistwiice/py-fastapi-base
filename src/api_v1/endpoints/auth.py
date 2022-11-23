@@ -7,6 +7,7 @@ from db.schemas import users as users_schemas
 from db.schemas import auth as auth_schemas
 from core.dependencies import get_db, get_current_user
 from utils.users.security import log_user, regenerate_token
+from utils.users.services import verify_password
 
 
 router = APIRouter(tags=['Authentication'])
@@ -45,6 +46,32 @@ async def refresh_token(token: auth_schemas.RefreshTokenBase, db: Session= Depen
         )
 
     return response
+
+
+@router.post("/change_password", description='Change a user password', status_code=status.HTTP_202_ACCEPTED)
+async def change_password(data: users_schemas.ChangePassword, user: users_schemas.User = Depends(get_current_user), db: Session= Depends(get_db)):
+
+    if data.new_password != data.confirm_password:
+        return HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='new_password and confirm_password do not match'
+        )
+
+    response = user_crud.update_password(db, str(user.id), data)
+
+    if response is None:
+        return HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User does not exist"
+        )
+
+    if isinstance(response, dict):
+        return HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=response
+        )
+
+    return {'message': 'Password reset successfully'}
 
 
 @router.get("/me", response_model=users_schemas.User, description='Get the current user', status_code=status.HTTP_200_OK)
