@@ -5,12 +5,6 @@ from pydantic import BaseModel, EmailStr
 from db.schemas.items import Item
 
 
-class TokenBase(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = "Bearer"
-
-
 class UserBase(BaseModel):
     username: str
     first_name: str

@@ -6,6 +6,8 @@ ROOT_DIRECTORY = pathlib.Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
+    SERVER_PORT: int = 8000
+
     API_V1_NAME: str = "/api/v1"
     SQLALCHEMY_DATABASE_URL = os.getenv('SQLALCHEMY_DATABASE_URL', default="sqlite:///db.sqlite3")
 

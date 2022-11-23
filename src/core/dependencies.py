@@ -39,7 +39,6 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(r
             algorithms=[settings.ALGORITHM],
             options={"verify_aud": False},
         )
-        print("===== ", token)
 
         if datetime.fromtimestamp(payload['exp']) < datetime.now():
             raise HTTPException(
@@ -58,3 +57,32 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(r
     if user is None:
         raise credentials_exception
     return user
+
+
+async def get_refresh_token(refresh_token: str = Depends(reuseable_oauth)) -> User:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate Refresh Token Information",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = jwt.decode(
+            refresh_token,
+            settings.JWT_REFRESH_SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+            options={"verify_aud": False},
+        )
+
+        if datetime.fromtimestamp(payload['exp']) < datetime.now():
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Refresh Token expired. Please login",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        username: str = payload.get("sub")
+
+    except JWTError:
+        raise credentials_exception
+
+    return username

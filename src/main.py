@@ -1,6 +1,9 @@
 import os
+
+import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+
 from api_v1 import api
 from core.config import settings
 
@@ -22,3 +25,8 @@ async def root():
 
 
 app.include_router(api.api_v1_router, prefix=settings.API_V1_NAME)
+
+
+if __name__ == '__main__':
+    uvicorn.run(app, port=settings.SERVER_PORT)
+    
