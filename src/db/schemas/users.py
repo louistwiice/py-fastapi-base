@@ -1,6 +1,6 @@
 from datetime import datetime
 from uuid import UUID
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, constr
 
 from db.schemas.items import Item
 
@@ -14,7 +14,7 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str
+    password: constr(min_length=3)
 
 
 class UserUpdate(BaseModel):
