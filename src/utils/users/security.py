@@ -30,7 +30,7 @@ async def log_user(db: Session, form_data: OAuth2PasswordRequestForm):
     }
 
 
-def regenerate_token(refresh_token: str):
+def regenerate_token(db: Session, refresh_token: str):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate Refresh Token Information",
@@ -52,6 +52,13 @@ def regenerate_token(refresh_token: str):
                 headers={"WWW-Authenticate": "Bearer"},
             )
         username: str = payload.get("sub")
+        user = db.query(models.User).get(username)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User does not exist anymore",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
     except JWTError:
         raise credentials_exception

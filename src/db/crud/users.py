@@ -4,18 +4,14 @@ import shutil
 import pytz
 from datetime import datetime
 
-from fastapi import UploadFile, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-from jose import jwt, JWTError
+from fastapi import UploadFile
 from sqlalchemy.orm import Session
-from starlette import status
 
-from core.auth import create_access_token, create_refresh_token
-from core.config import ROOT_DIRECTORY, settings
+from core.config import ROOT_DIRECTORY
 from db.models import users as models
 from db.schemas import users as users_schemas
 from utils.common import generate_string
-from utils.users.services import hashed_password, verify_password
+from utils.users.services import hashed_password
 
 
 def create(db: Session, user: users_schemas.UserCreate) -> models.User:
@@ -34,7 +30,6 @@ def create(db: Session, user: users_schemas.UserCreate) -> models.User:
     db.commit()
     db.refresh(db_user)
     return db_user
-
 
 
 def list_all(db: Session, skip: int = 0, limit: int = 100) -> list[models.User]:

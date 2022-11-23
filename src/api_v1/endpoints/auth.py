@@ -35,8 +35,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session= D
 
 
 @router.post("/refresh_token", response_model=auth_schemas.TokenBase, description='Refresh user token', status_code=status.HTTP_200_OK)
-async def refresh_token(token: auth_schemas.RefreshTokenBase):
-    response = regenerate_token(token.refresh_token)
+async def refresh_token(token: auth_schemas.RefreshTokenBase, db: Session= Depends(get_db)):
+    response = regenerate_token(db, token.refresh_token)
 
     if response is None:
         return HTTPException(
