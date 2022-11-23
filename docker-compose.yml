@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: fastapi-db
+    volumes:
+      - ./data/postgres_db:/var/lib/postgresql/data/
+    env_file:
+      - ./.envs/.env.postgres
+    ports:
+      - 5432:5432
+
