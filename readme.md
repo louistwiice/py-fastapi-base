@@ -6,6 +6,7 @@ The goal is to have a base project base with FastAPI. The project run on docker
 ## Settings
 * Postgresql
 * Redis
+* Alembic
 
 ## Run projects
 
