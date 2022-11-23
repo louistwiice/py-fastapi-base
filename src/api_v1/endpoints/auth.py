@@ -6,6 +6,7 @@ from db.crud import users as user_crud
 from db.schemas import users as users_schemas
 from db.schemas import auth as auth_schemas
 from core.dependencies import get_db, get_current_user
+from utils.users.security import log_user, regenerate_token
 
 
 router = APIRouter(tags=['Authentication'])
@@ -22,7 +23,7 @@ def create_user(user: users_schemas.UserCreate, db: Session= Depends(get_db)):
 
 @router.post("/login", response_model=auth_schemas.TokenBase, description='Authenticate a user', status_code=status.HTTP_200_OK)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session= Depends(get_db)):
-    response = await user_crud.login(db, form_data)
+    response = await log_user(db, form_data)
 
     if response is None:
         return HTTPException(
@@ -35,7 +36,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session= D
 
 @router.post("/refresh_token", response_model=auth_schemas.TokenBase, description='Refresh user token', status_code=status.HTTP_200_OK)
 async def refresh_token(token: auth_schemas.RefreshTokenBase):
-    response = user_crud.regenerate_token(token.refresh_token)
+    response = regenerate_token(token.refresh_token)
 
     if response is None:
         return HTTPException(
